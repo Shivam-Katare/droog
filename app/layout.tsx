@@ -8,7 +8,6 @@ import {
   UserButton
 } from '@clerk/nextjs'
 import "./globals.css";
-import Head from "next/head";
 
 const inter = Inter({ subsets: ["latin"] });
 
