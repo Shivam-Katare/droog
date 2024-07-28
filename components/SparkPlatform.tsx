@@ -23,7 +23,7 @@ import { useSelectedPlatformStore } from "@/store/useSelectedPostsType"
 const frameworks = [
   {
     value: "xpost",
-    label: "X(Formally Twitter) Post",
+    label: "X(Formally Twitter)",
   },
   {
     value: "linkedinpost",
@@ -58,15 +58,15 @@ export function SparkPlatform() {
         >
           {platform
             ? frameworks.find((framework) => framework.value === platform)?.label
-            : "Select a type of post..."}
+            : "Select a Platform..."}
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-[200px] p-0">
         <Command>
-          <CommandInput placeholder="Search framework..." />
+          <CommandInput placeholder="Select a Platform..." />
           <CommandList>
-            <CommandEmpty>No post found.</CommandEmpty>
+            <CommandEmpty>No Platform found.</CommandEmpty>
             <CommandGroup>
               {frameworks.map((framework) => (
                 <CommandItem

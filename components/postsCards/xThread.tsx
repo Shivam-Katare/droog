@@ -1,19 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import { Card } from '../ui/card';
 import { TooltipProvider, Tooltip, TooltipContent, TooltipTrigger } from '../ui/tooltip';
-import { Copy, Edit2, Save } from 'lucide-react';
+import { Check, Copy, Edit2, Save } from 'lucide-react';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTrigger, DialogTitle } from '../ui/dialog';
 import { FaSquareTwitter, FaWandMagicSparkles } from 'react-icons/fa6';
 import { Button } from '../ui/button';
 import Image from 'next/image';
 import useStore from '@/store/apiStore';
+import { useUser } from '@clerk/nextjs';
+import toast from 'react-hot-toast';
 
 function XThread() {
   const [chunks, setChunks] = useState<string[]>([]);
   const [isEditable, setIsEditable] = useState(false);
-  const { generateImage, loading, generatedContent, savePost, tweets } = useStore(); // Access the generateImage function and loading state from the store
+  const { loading, generatedContent, savePost, tweets } = useStore(); // Access the generateImage function and loading state from the store
   const [content, setContent] = useState(generatedContent.repeat(50));
   const [editableTweets, setEditableTweets] = useState(tweets.map(tweet => ({ content: tweet, isEditable: false })));
+  const user = useUser().user;
+  const userName = user?.username ?? '';
+  const user_id = user?.id ?? '';
+  const userProfile = user?.imageUrl ?? '';
 
   useEffect(() => {
     const words = content.split(' ');
@@ -43,132 +49,111 @@ function XThread() {
     ));
   };
 
-  const handleGenerateImage = async () => {
-    await generateImage(content);
+  const handleCopyToClipboard = (content: any) => {
+    navigator.clipboard.writeText(content);
+    toast.success('Copied to clipboard');
+  };
+
+  const handleDoneEditing = () => {
+    setEditableTweets(prev => prev.map(tweet => ({ ...tweet, isEditable: false })));
   }
+
+  const handleSaveThread = async () => {
+    const combinedContent = editableTweets.map(tweet => tweet.content).join('\n\n');
+    
+    const postData = {
+      user_id,
+      userName,
+      postContent: combinedContent,
+      post_type: 'twitter_thread'
+    };
+
+    await savePost(postData);
+  };
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-      {editableTweets.map((chunk, index) => (
+        {editableTweets.map((tweet, index) => (
         <React.Fragment key={index}>
-          <Card>
-            <div className='p-[16px] max-w-[17rem] md:max-w-[32rem] md:min-w-[28rem]' style={{ boxShadow: "#2563eb -1px -4px 20px 0px", border: "2px solid #2563eb", borderRadius: "13px" }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: "space-between" }}>
-                <div style={{ display: 'flex', alignItems: 'center' }}>
-                  <img
-                    src="https://via.placeholder.com/50"
-                    alt="Profile"
-                    style={{ borderRadius: '50%', marginRight: '12px' }}
-                  />
-                  <div>
-                    <div style={{ fontWeight: 'bold' }}>User Name</div>
-                    <div style={{ color: 'gray' }}><FaSquareTwitter /> </div>
-                  </div>
+          <Card className="p-4 shadow-lg border-2 border-blue-500 rounded-xl max-w-[31rem]">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center space-x-3">
+              <Image
+                src={userProfile}
+                alt="Profile Image"
+                style={{ borderRadius: '50%', marginRight: '12px' }}
+                width={50}
+                height={50}
+              />
+                <div>
+                  <div className="font-bold">{userName}</div>
+                  <div className="text-gray-500 flex items-center"><FaSquareTwitter className="mr-1" /> @{userName}</div>
                 </div>
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger>
-                      <div className='cursor-pointer'><Copy /> </div>
-                      <TooltipContent sideOffset={8}>Copy this post</TooltipContent>
-                    </TooltipTrigger>
-                  </Tooltip>
-                </TooltipProvider>
               </div>
-              <div className='mt-3'>
-                {chunk?.isEditable ? (
-                  <textarea
-                    value={chunk.content}
-                    onChange={(e) => handleChange(e, index)}
-                    className='p-[16px] w-min max-w-[17rem] md:max-w-[32rem] md:min-w-[28rem]'
-                    id='style-4'
-                  />
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button variant="ghost" size="icon" onClick={() => handleCopyToClipboard(tweet.content)}>
+                      <Copy className="h-4 w-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Copy this tweet</TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </div>
+            <div className="mb-4">
+              {tweet.isEditable ? (
+                <textarea
+                value={tweet.content}
+                  onChange={(e) => handleChange(e, index)}
+                  className="w-[25rem] p-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  rows={4}
+                />
+              ) : (
+                <p className="text-gray-800">{tweet.content}</p>
+              )}
+            </div>
+            <div className="flex justify-end">
+              {
+                tweet.isEditable ? (
+                  <div className="flex space-x-4">
+                    <Button
+                      className="bg-blue-500 hover:bg-blue-600 text-white"
+                      onClick={handleDoneEditing}
+                    >
+                      <Check className="h-4 w-4 mr-2" />
+                      Done
+                    </Button>
+                  </div>
                 ) : (
-                  chunk.content
-                )}
-              </div>
-              <div style={{ marginTop: '12px', display: 'flex', justifyContent: 'space-between', color: 'gray' }}>
-            {chunk.isEditable ? (
-              <div onClick={handleSave} className='cursor-pointer'><Save /></div>
-            ) : (
-              <div onClick={handleEdit} className='cursor-pointer'><Edit2 /></div>
-            )}
-            {
-              !isEditable && (
-                <>
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger>
-                        <div onClick={handleSave}><Save /></div>
-                        <TooltipContent sideOffset={8}>Save this post</TooltipContent>
-                      </TooltipTrigger>
-                    </Tooltip>
-                  </TooltipProvider>
-                  <Dialog>
-                    <DialogTrigger>
-                      <FaWandMagicSparkles className='w-6 h-6' />
-                    </DialogTrigger>
-                    <DialogContent className="sm:max-w-[425px]">
-                      <DialogHeader>
-                        <DialogTitle>Generate Image</DialogTitle>
-                        <DialogDescription>
-                          You can generate an image of this post to share on social media.
-                        </DialogDescription>
-                      </DialogHeader>
-                      <div className="grid gap-4 py-4">
-                        <textarea
-                          value={chunk.content}
-                          onChange={(e) => handleChange(e, index)}
-                          className='p-[16px] w-full'
-                          id='style-4'
-                        />
-                      </div>
-                      <DialogFooter>
-                        <Button type="button" onClick={handleGenerateImage} disabled={loading}>
-                          {loading ? 'Generating...' : 'Generate'}
-                        </Button>
-                      </DialogFooter>
-                      {/* {imageUrl && (
-                            <div className="mt-4">
-                              <img src={imageUrl} alt="Generated" className="w-full" />
-                            </div>
-                          )} */}
-
-                      <div
-                        className='mt-4 max-h-48 overflow-auto grid grid-cols-2 justify-items-center justify-center items-center gap-5'
-                        id="style-4"
-                      >
-                        <Image
-                          src="https://ik.imagekit.io/dnwefib6s4/5.png?updatedAt=1718010607272"
-                          alt="Profile"
-                          width={250}
-                          height={330}
-                          className='h-auto w-auto object-cover transition-all hover:scale-105 aspect-[3/4]'
-                        />
-
-                        <Image
-                          src="https://ik.imagekit.io/dnwefib6s4/Gemini_Generated_Image_5d1ql35d1ql35d1q.jfif?updatedAt=1720417256685"
-                          alt="Profile"
-                          width={250}
-                          height={330}
-                          className='h-auto w-auto object-cover transition-all hover:scale-105 aspect-[3/4]'
-                        />
-                      </div>
-                    </DialogContent>
-                  </Dialog>
-                </>
-              )
-            }
-          </div>
+                  <Button
+                    className="bg-blue-500 hover:bg-blue-600 text-white"
+                    onClick={() => handleEdit(index)}
+                  >
+                    <Edit2 className="h-4 w-4 mr-2" />
+                    Edit
+                  </Button>
+                )
+              }
             </div>
           </Card>
-          {/* Conditionally render the vertical line except after the last card */}
-          {index < tweets.length - 1 && (
-            <div className='w-full grid justify-items-start'>
-              <div style={{ width: '2px', height: '30px', backgroundColor: 'gray', alignSelf: 'center', margin: '8px 0' }}></div>
+          {index < editableTweets.length - 1 && (
+            <div className="flex justify-center">
+              <div className="w-0.5 h-8 bg-gray-300"></div>
             </div>
           )}
         </React.Fragment>
       ))}
+      <div className="flex justify-center mt-6">
+      <Button 
+          className="bg-blue-500 hover:bg-blue-600 text-white"
+          onClick={handleSaveThread}
+          disabled={loading}
+        >
+          <Save className="h-4 w-4 mr-2" />
+          {loading ? 'Saving...' : 'Save Thread'}
+        </Button>
+      </div>
     </div>
   );
 }

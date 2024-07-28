@@ -10,9 +10,51 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { CloudIcon, CopyIcon } from "lucide-react";
 import toast from 'react-hot-toast';
+import useStore from '@/store/apiStore';
+import { useApiKeyStore } from '@/store/apiKeyStore';
 
 const languages = ['English', 'Hindi', 'Spanish', 'French', 'Russian'];
-const tones = ['Neutral', 'Funny', 'Formal', 'Inspirational'];
+const tones = [
+  'Neutral',
+  'Funny',
+  'Happy',
+  'Sad',
+  'Fun',
+  'Friendly',
+  'Friends',
+  'Family',
+  'Relatives',
+  'Roast',
+  'Sarcastic',
+  'Formal',
+  'Inspirational',
+  'Sarcastic',
+  'Dramatic',
+  'Romantic',
+  'Mysterious',
+  'Energetic',
+  'Relaxed',
+  'Professional',
+  'Casual',
+  'Poetic',
+  'Nostalgic',
+  'Optimistic',
+  'Pessimistic',
+  'Excited',
+  'Thoughtful',
+  'Whimsical',
+  'Motivational',
+  'Empathetic',
+  'Adventurous',
+  'Confident',
+  'Humble',
+  'Playful',
+  'Serious',
+  'Grateful',
+  'Curious',
+  'Philosophical',
+  'Witty'
+];
 
 const ImageCaptioner: React.FC = () => {
   const [image, setImage] = useState<File | null>(null);
@@ -24,42 +66,56 @@ const ImageCaptioner: React.FC = () => {
   const [language, setLanguage] = useState<string>('English');
   const [variants, setVariants] = useState<number>(1);
 
+  const { developerAPIKeyUsageLeft, setDeveloperAPIKeyUsageLeft, developerHuggingFaceTokenUsageLeft, setDeveloperHuggingFaceTokenUsageLeft } = useStore();
+  const { geminiKey, huggingFaceKey } = useApiKeyStore();
+
   const onDrop = useCallback((acceptedFiles: File[]) => {
     if (acceptedFiles && acceptedFiles[0]) {
       setImage(acceptedFiles[0]);
     }
   }, []);
 
-  const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop });
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop, accept: {
+    'image/png': ['.png'],
+    'image/jpeg': ['.jpg', '.jpeg'],
+  } });
 
   const generateCaptionVariants = async (initialCaption: string) => {
-    const API_KEY = process.env.NEXT_PUBLIC_GEMINI_API_KEY;
+
+    if( developerAPIKeyUsageLeft <= 0 ) {
+      toast.error('You have reached the daily limit for using the Huggingface API. Please try again tomorrow.');
+      return;
+    }
+    
+    const API_KEY = geminiKey || process.env.NEXT_PUBLIC_GEMINI_API_KEY;
     if (!API_KEY) {
-      throw new Error("Gemini API key is not set");
+      toast.error("Gemini API key is not set");
     }
 
-    const genAI = new GoogleGenerativeAI(API_KEY);
+    const genAI = new GoogleGenerativeAI(API_KEY || '');
     const model = genAI.getGenerativeModel({ model: "gemini-pro" });
 
     const prompt = `Generate ${variants} ${tone.toLowerCase()} captions in ${language} based on the following image description. ${useHashtags ? 'Include relevant hashtags.' : ''} ${useEmojis ? 'Include appropriate emojis.' : ''} Keep each caption concise and engaging.
 
-Initial caption: "${initialCaption}"
+              Initial caption: "${initialCaption}"
 
-Please provide the captions in a numbered list format.`;
+      Please provide the captions in a numbered list format.`;
 
     try {
       const result = await model.generateContent(prompt);
       const response = result.response;
       const generatedText = response.text();
 
-      // Parse the numbered list into an array of captions
       const variantCaptions = generatedText.split('\n')
         .filter(line => line.trim().match(/^\d+\./))
         .map(line => line.replace(/^\d+\.\s*/, '').trim());
 
+        if (!geminiKey && developerAPIKeyUsageLeft > 0) {
+          setDeveloperAPIKeyUsageLeft(developerAPIKeyUsageLeft - 1);
+        }
       return variantCaptions;
     } catch (error) {
-      toast.error('Error generating captions. Please try again.');
+      toast.error('Error generating captions. Please try again. Or use your Huggingface Token.');
       throw error;
     }
   };
@@ -68,9 +124,14 @@ Please provide the captions in a numbered list format.`;
   const generateCaption = async () => {
     if (!image) return;
 
+    if( developerHuggingFaceTokenUsageLeft <= 0 ) {
+      toast.error('You have reached the limit for using the Huggingface Token. Please try to add your own token.');
+      return;
+    }
+
     setLoading(true);
     try {
-      const hf = new HfInference(process.env.NEXT_PUBLIC_HF_ACCESS_TOKEN);
+      const hf = new HfInference(huggingFaceKey || process.env.NEXT_PUBLIC_HF_ACCESS_TOKEN);
       const result = await hf.imageToText({
         model: 'Salesforce/blip-image-captioning-large',
         data: image,
@@ -78,8 +139,13 @@ Please provide the captions in a numbered list format.`;
 
       const initialCaption = result.generated_text;
       const variantCaptions = await generateCaptionVariants(initialCaption);
-      setCaptions(variantCaptions);
+      setCaptions(variantCaptions || []);
       toast.success('Captions generated successfully!');
+
+      if (!huggingFaceKey && developerHuggingFaceTokenUsageLeft > 0) {
+        setDeveloperHuggingFaceTokenUsageLeft(developerHuggingFaceTokenUsageLeft - 1);
+      }
+
     } catch (error) {
       toast.error('Error generating captions. Please try again.');
       setCaptions(['Error generating captions. Please try again.']);

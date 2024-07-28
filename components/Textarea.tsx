@@ -24,7 +24,10 @@ const FormSchema = z.object({
   bio: z
     .string()
     .min(200, {
-      message: "Content must be at least 200 words.",
+      message: "Content must be at least 200 characters.",
+    })
+    .max(3000, {
+      message: "Content must not exceed 3k characters.",
     })
 })
 
@@ -60,21 +63,21 @@ export function TextareaForm() {
               <FormLabel>Enter your blog here</FormLabel>
               <FormControl>
                 <Textarea
-                  placeholder="Tell us a little bit about yourself"
+                  placeholder="Enter your blog here. Copy and paste from your blog."
                   className="resize-none"
                   disabled={!value || loading}
                   {...field}
                 />
               </FormControl>
               <FormDescription>
-                You can enter any form of content up to <span>5K</span>
+                You can enter text form of content between 200 and 3k characters.
               </FormDescription>
               <FormMessage />
             </FormItem>
           )}
         />
         <div className="w-full grid grid-cols-2 justify-between justify-items-start">
-          <Button type="submit" disabled={loading && !value}>
+          <Button type="submit" disabled={loading || value.length <= 0}>
             {loading ? 'Generating...' : 'Submit'}
           </Button>
 

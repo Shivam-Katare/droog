@@ -76,7 +76,7 @@
   }
 
   ::-webkit-scrollbar {
-    width: 4px;
+    width: 1px;
   }
   
   ::-webkit-scrollbar:horizontal {
@@ -84,7 +84,7 @@
   }
   
   ::-webkit-scrollbar-thumb {
-    @apply bg-rose-900 rounded-xl;
+    @apply bg-gray-400 rounded-xl;
   }
   
   .task > ::-webkit-scrollbar-thumb {
@@ -98,10 +98,10 @@
   
     #style-4::-webkit-scrollbar {
       width: 1px;
-      background-color: #F5F5F5;
+      background-color: #f5f5f5;
     }
   
     #style-4::-webkit-scrollbar-thumb {
       background-color: #000000;
-      border: 0.5px solid #555555;
+      border: 0.5px solid #55555500;
     }

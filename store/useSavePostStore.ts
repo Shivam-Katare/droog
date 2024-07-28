@@ -1,6 +1,7 @@
 // store/useStore.ts
 import {create} from 'zustand';
 import { supabase } from '@/lib/supabaseClient';
+import toast from 'react-hot-toast';
 
 interface SavedPost {
   id: string;
@@ -108,9 +109,9 @@ export const useSavedPostsStore = create<SavedPostsState>((set, get) => ({
       if (error) throw error;
   
       set({ savedPosts: data || [], totalPosts: count || 0, loading: false });
-    } catch (error) {
+    } catch (error: any) {
       set({ loading: false });
-      console.error('Error fetching saved posts:', error);
+      toast.error('No Post found');
     }
   },  
 
@@ -141,9 +142,10 @@ export const useSavedPostsStore = create<SavedPostsState>((set, get) => ({
       if (error) throw error;
 
       set({ selectedPosts: [] });
+      toast.success('Selected posts deleted successfully!');
       get().fetchSavedPosts(user_id);
-    } catch (error) {
-      console.error('Error deleting selected posts:', error);
+    } catch (error: any) {
+      toast.error('Error deleting selected posts:', error);
     }
   },
   

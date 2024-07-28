@@ -119,7 +119,7 @@ const SparklesText: React.FC<SparklesTextProps> = ({
         {sparkles.map((sparkle) => (
           <Sparkle key={sparkle.id} {...sparkle} />
         ))}
-        <strong>{text}</strong>
+        <strong className="text-5xl md:text-7xl font-bold bg-gradient-to-r from-primary to-purple-600 text-transparent bg-clip-text">{text}</strong>
       </span>
     </div>
   );
@@ -136,7 +136,7 @@ const Sparkle: React.FC<Sparkle> = ({ id, x, y, color, delay, scale }) => {
         scale: [0, scale, 0],
         rotate: [75, 120, 150],
       }}
-      transition={{ duration: 0.8, repeat: Infinity, delay }}
+      transition={{ duration: 1.5, repeat: Infinity, delay }}
       width="21"
       height="21"
       viewBox="0 0 21 21"

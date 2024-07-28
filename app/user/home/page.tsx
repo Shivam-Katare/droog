@@ -20,13 +20,17 @@ import SparkPosts from '@/components/postsCards/sparkPost';
 import { SparkPlatform } from '@/components/SparkPlatform';
 import ImageCaptioner from '@/components/Caption';
 import BlurIn from '@/components/magicui/blur-in';
+import { Dock, DockIcon } from '@/components/magicui/dock';
+import { FaDev, FaHashnode, FaMedium } from 'react-icons/fa6';
+import { SiDailydotdev } from 'react-icons/si';
+import Link from 'next/link';
 
 function Home() {
   const { value } = useSelectedValueStore()
   const { platform } = useSelectedPlatformStore()
-  const { successfullyGenerated } = useStore()
+  const { successfullyGenerated, successfullyPromptGenerated } = useStore()
   return (
-    <Tabs defaultValue='blog_to_post' className='space-y-6 p-8'>
+    <Tabs defaultValue='spark_an_idea' className='space-y-6 p-8'>
       <TabsList className="grid w-full grid-cols-3">
         <TabsTrigger value="blog_to_post">Blog to post</TabsTrigger>
         <TabsTrigger value="spark_an_idea">Spark an Idea</TabsTrigger>
@@ -41,6 +45,35 @@ function Home() {
           {value === 'xthread' && successfullyGenerated && <XThread />}
           {value === 'xpost' && successfullyGenerated && <SingleXPost />}
           {value === 'linkedinpost' && successfullyGenerated && <LinkedInPosts />}
+          {
+            !successfullyGenerated && (
+              <>
+                <Dock magnification={60} distance={100}>
+            <DockIcon className="bg-black/10 dark:bg-white/10 p-3">
+              <Link href="https://hashnode.com/" target='_blank'>
+                <FaHashnode className="size-full text-blue-600" />
+              </Link>
+            </DockIcon>
+            <DockIcon className="bg-black/10 dark:bg-white/10 p-3">
+              <Link href="https://medium.com/" target='_blank'>
+                <FaMedium className="size-full" />
+              </Link>
+            </DockIcon>
+            <DockIcon className="bg-black/10 dark:bg-white/10 p-3">
+            <Link href="https://daily.dev/" target='_blank'>
+              <SiDailydotdev className="size-full" />
+            </Link>  
+            </DockIcon>
+            <DockIcon className="bg-black/10 dark:bg-white/10 p-3">
+            <Link href="https://dev.to/" target='_blank'>
+              <FaDev className="size-full" />
+            </Link> 
+            </DockIcon>
+          </Dock>
+          <p className='mt-6'>Click on any to blog platform where you write and paste blog content here.</p>
+              </>
+            )
+          }
         </div>
       </TabsContent>
       <TabsContent value="spark_an_idea">
@@ -52,7 +85,7 @@ function Home() {
           />
           <SparkPlatform />
           <SparkTextArea />
-          {platform && successfullyGenerated && <SparkPosts />}
+          {platform && successfullyPromptGenerated && <SparkPosts />}
         </div>
       </TabsContent>
 

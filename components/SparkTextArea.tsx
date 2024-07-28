@@ -16,24 +16,24 @@ import {
 } from "@/components/ui/form"
 import { Textarea } from "@/components/ui/textarea"
 import { toast } from "@/components/ui/use-toast"
-import { useSelectedPlatformStore, useSelectedValueStore } from "@/store/useSelectedPostsType"
+import { useSelectedPlatformStore } from "@/store/useSelectedPostsType"
 import useStore from "@/store/apiStore"
 import Link from "next/link"
 
 const FormSchema = z.object({
   bio: z
     .string()
-    .min(30, {
-      message: "Content must be at least 30 charcahters.",
+    .min(20, {
+      message: "Content must be at least 20 characters.",
     })
-    .max(500, {
-      message: "Content must be at most 50 words.",
+    .max(200, {
+      message: "Content must not exceed 200 characters.",
     })
 })
 
 export function SparkTextArea() {
 
-  const { generatePost, loading, generatePlatformPost } = useStore()
+  const { loading, generatePlatformPost } = useStore()
   const { platform } = useSelectedPlatformStore();
 
   const form = useForm<z.infer<typeof FormSchema>>({
@@ -63,14 +63,14 @@ export function SparkTextArea() {
               <FormLabel>Enter your prompt here</FormLabel>
               <FormControl>
                 <Textarea
-                  placeholder="Tell us a little bit about yourself"
+                  placeholder="Write a topic you want to create content for..."
                   className="resize-none"
                   disabled={loading || !platform}
                   {...field}
                 />
               </FormControl>
               <FormDescription>
-                You can enter any form of content up to <span>50 words</span>
+                You can enter text form of content between 20 and 200 characters.
               </FormDescription>
               <FormMessage />
             </FormItem>
