@@ -6,7 +6,7 @@ import useStore from '@/store/apiStore';
 import Image from 'next/image';
 import { FaWandMagicSparkles } from "react-icons/fa6";
 import { useUser } from '@clerk/nextjs';
-import toast, { Toaster } from 'react-hot-toast';
+import toast from 'react-hot-toast';
 import { Copy, Download, Edit2, Save, X } from 'lucide-react';
 import { useSelectedValueStore } from '@/store/useSelectedPostsType';
 import { Input } from '../ui/input';
@@ -18,13 +18,13 @@ import { Skeleton } from '../ui/skeleton';
 function SingleXPost() {
   const [isEditable, setIsEditable] = useState(false);
 
-  const [generatedImageUrl, setGeneratedImageUrl] = useState('');
   const user = useUser().user;
   const userName = user?.username ?? '';
   const user_id = user?.id ?? '';
   const userProfile = user?.imageUrl ?? '';
   const { generateImage, loading, generatedContent, savePost, imageUrl, apiKeyUsageCount, setUserApiKey, userApiKey, generateImagePrompt } = useStore();
   const { value } = useSelectedValueStore()
+  const [generatedImageUrl, setGeneratedImageUrl] = useState(imageUrl);
   const [content, setContent] = useState(generatedContent);
   const [imagePrompt, setImagePrompt] = useState('');
   const [showAlertDialog, setShowAlertDialog] = useState(false);
@@ -53,7 +53,6 @@ function SingleXPost() {
 
   const handleGenerateImage = async () => {
     await generateImage(imagePrompt);
-    setGeneratedImageUrl(imageUrl);
     setContent(useStore.getState().generatedContent);
   };
 
@@ -106,6 +105,10 @@ function SingleXPost() {
   useEffect(() => {
     setContent(generatedContent);
   }, [generatedContent]);
+
+  useEffect(() => {
+    setGeneratedImageUrl(imageUrl);
+  }, [imageUrl]);
 
   return (
     <div>
@@ -202,7 +205,7 @@ function SingleXPost() {
                                   {loading ? 'Generating...' : 'Generate'}
                                 </Button>
                               </div>
-                              {loading && <Skeleton className="h-12 w-12 rounded-full" />}
+                              {loading && <p className='text-black text-center font-bold'>It will take few seconds, but the wait will worth it</p>}
                               {generatedImageUrl && (
                                 <div className="mt-4">
                                   <Image src={generatedImageUrl} alt="Generated" width={300} height={300} className="w-full h-auto" />
@@ -251,7 +254,7 @@ function SingleXPost() {
                   <TooltipProvider>
                     <Tooltip>
                       <TooltipTrigger>
-                        <button onClick={handlePostToTwitter} className="bg-blue-400 text-white p-2 rounded">
+                        <button onClick={handlePostToTwitter} className="bg-black text-white p-2 rounded">
                           Post to X
                         </button>
                         <TooltipContent sideOffset={8}>Post this content to X (Twitter)</TooltipContent>
@@ -264,7 +267,6 @@ function SingleXPost() {
           </div>
         </div>
       </Card>
-      <Toaster />
     </div>
   );
 }

@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import Notifications from "@/components/Notifications";
 import APIKeyManager from "@/components/APIKeyManager";
 import { Metadata } from "next";
+import Link from "next/link";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -30,7 +31,9 @@ export default function RootLayout({
       <html lang="en">
         <body className={inter.className}>
           <header className="w-full h-[3rem] flex justify-between items-center p-5 bg-gradient-to-r from-[#2e1348] to-[#a855f7] text-white">
-            <h1 className="text-2xl font-bold">DROOG</h1>
+            <Link href="/">
+              <h1 className="text-2xl font-bold">DROOG</h1>
+            </Link>
             
             <div className="flex items-center space-x-4">
               <Notifications />

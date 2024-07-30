@@ -24,7 +24,7 @@ function LinkedInPosts() {
   const [imagePrompt, setImagePrompt] = useState('');
   const [showAlertDialog, setShowAlertDialog] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [generatedImageUrl, setGeneratedImageUrl] = useState('');
+  const [generatedImageUrl, setGeneratedImageUrl] = useState(imageUrl);
 
   const user = useUser().user;
   const userName = user?.username ?? '';
@@ -65,6 +65,7 @@ function LinkedInPosts() {
 
   const handleGenerateImage = async () => {
     await generateImage(imagePrompt)
+    setContent(useStore.getState().generatedContent);
   };
 
   const handleDownload = () => {
@@ -105,6 +106,10 @@ function LinkedInPosts() {
   useEffect(() => {
     setContent(generatedContent);
   }, [generatedContent]);
+
+  useEffect(() => {
+    setGeneratedImageUrl(imageUrl);
+  }, [imageUrl]);
 
   return (
     <div>
@@ -191,7 +196,7 @@ function LinkedInPosts() {
                           {loading ? 'Generating...' : 'Generate'}
                         </Button>
                       </div>
-                      {loading && <Skeleton className="h-12 w-12 rounded-full" />}
+                      {loading && <p className='text-black text-center font-bold'>It will take few seconds, but the wait will worth it</p>}
                       {generatedImageUrl && (
                         <div className="mt-4">
                           <Image src={generatedImageUrl} alt="Generated" width={300} height={300} className="w-full h-auto" />

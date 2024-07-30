@@ -112,11 +112,11 @@ const APIKeyManager = () => {
                     <Tooltip>
                     <TooltipTrigger asChild>
                     <Badge variant={value ? 'default' : 'destructive'}>
-                          {value ? '' : `${getUsageCount(key)}  uses left`}
+                          {value ? 'It`s Your Key' : `${getUsageCount(key)}  uses left`}
                         </Badge>
                     </TooltipTrigger>
                     <TooltipContent>
-                      {value ? '' : 'Please add an API key'}
+                      {value ? 'It`s Your Key' : 'Please add an API key'}
                     </TooltipContent>
                   </Tooltip>
                    </TooltipProvider>

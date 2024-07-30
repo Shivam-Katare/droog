@@ -73,7 +73,7 @@ const useStore = create<StoreState>()(
       userIds: [],
       posts: [],
       developerAPIKeyUsageLeft: 20,
-      developerStabilityAPIKeyUsageLeft: 2,
+      developerStabilityAPIKeyUsageLeft: 1,
       developerHuggingFaceTokenUsageLeft: 20,
       setDeveloperHuggingFaceTokenUsageLeft: (usage: number) => set({ developerHuggingFaceTokenUsageLeft: usage }),
       setDeveloperStabilityAPIKeyUsageLeft: (usage: number) => set({ developerStabilityAPIKeyUsageLeft: usage }),

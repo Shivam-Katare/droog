@@ -11,7 +11,7 @@ import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Textarea } from '@/components/ui/textarea';
 import { FaXTwitter, FaLinkedin, FaInstagram, FaFacebook } from 'react-icons/fa6';
 import { SiPeerlist } from 'react-icons/si';
-import { Filter, ChevronDown, SortAsc, SortDesc, Calendar, Clock, Trash2, Copy } from 'lucide-react';
+import { Filter, ChevronDown, SortAsc, SortDesc, Calendar, Clock, Trash2, Copy, ArrowBigLeft } from 'lucide-react';
 import { useUser } from '@clerk/nextjs';
 import { Skeleton } from '@/components/ui/skeleton';
 import useStore from '@/store/apiStore';
@@ -20,6 +20,7 @@ import { useSavedPostsStore } from '@/store/useSavePostStore';
 import toast, { Toaster } from 'react-hot-toast';
 import { TooltipProvider } from '@radix-ui/react-tooltip';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/tooltip';
+import Link from 'next/link';
 
 export default function SavedPosts() {
   const {
@@ -138,7 +139,12 @@ export default function SavedPosts() {
         <CardContent className="p-6">
           <div className="flex flex-col gap-12">
             <div className="flex items-center justify-between flex-wrap">
+              <div className='grid grid-cols-[0.3fr_1fr] items-center'>
+              <Link href="/user/home">
+                <ArrowBigLeft className="h-6 w-6 cursor-pointer" />
+              </Link>
               <h1 className="text-2xl font-bold">Saved Posts</h1>
+              </div>
               <div className="flex items-center gap-2 flex-wrap">
                 <Popover>
                   <PopoverTrigger asChild>
@@ -213,7 +219,7 @@ export default function SavedPosts() {
                     <th className="p-2 text-left">Post Title</th>
                     <th className="p-2 text-left">Type</th>
                     <th className="p-2 text-left">Created At</th>
-                    <th className="p-2 text-left">Last Updated</th>
+                    <th className="p-2 text-left">Last Created</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -297,7 +303,7 @@ export default function SavedPosts() {
                                 <p className="mt-1 text-sm text-gray-900">{dayjs(post.created_at).format('DD/MM/YYYY')}</p>
                               </div>
                               <div>
-                                <p className="text-sm font-medium text-gray-500">Last Updated</p>
+                                <p className="text-sm font-medium text-gray-500">Last Created</p>
                                 <p className="mt-1 text-sm text-gray-900">{calculateTimeAgo(post.created_at)}</p>
                               </div>
                             </div>
