@@ -30,7 +30,6 @@ const tones = [
   'Inspirational',
   'Sarcastic',
   'Dramatic',
-  'Romantic',
   'Mysterious',
   'Energetic',
   'Relaxed',
@@ -39,7 +38,6 @@ const tones = [
   'Poetic',
   'Nostalgic',
   'Optimistic',
-  'Pessimistic',
   'Excited',
   'Thoughtful',
   'Whimsical',
@@ -53,7 +51,6 @@ const tones = [
   'Grateful',
   'Curious',
   'Philosophical',
-  'Witty'
 ];
 
 const ImageCaptioner: React.FC = () => {
