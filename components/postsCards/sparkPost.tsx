@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Card } from '../ui/card';
 import useStore from '@/store/apiStore';
 import { Copy, Download, Edit, Heart, Save, X } from 'lucide-react';
@@ -22,7 +22,7 @@ function SparkPosts() {
   const [isEditing, setIsEditing] = useState(false);
   const { generatedPlatformContent, generateImage, savePost, imageUrl, apiKeyUsageCount, setUserApiKey, userApiKey, generateImagePrompt, loading } = useStore();
   const [content, setContent] = useState(generatedPlatformContent);
-  const [generatedImageUrl, setGeneratedImageUrl] = useState('');
+  const [generatedImageUrl, setGeneratedImageUrl] = useState(imageUrl);
   const [imagePrompt, setImagePrompt] = useState('');
   const [showAlertDialog, setShowAlertDialog] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -103,9 +103,12 @@ function SparkPosts() {
 
   const handleGenerateImage = async () => {
     await generateImage(imagePrompt);
-    setGeneratedImageUrl(imageUrl);
     setContent(useStore.getState().generatedPlatformContent);
   };
+
+  useEffect(() => {
+    setGeneratedImageUrl(imageUrl);
+  }, [imageUrl]);
 
   return (
     <div>
@@ -188,11 +191,11 @@ function SparkPosts() {
                           <Button type="button" onClick={handleIconClick} disabled={loading}>
                             {loading ? 'Writing Prompt...' : 'Autofill Prompt'}
                           </Button>
-                          <Button type="button" onClick={handleGenerateImage} disabled={loading || imagePrompt.length > 30}>
+                          <Button type="button" onClick={handleGenerateImage} disabled={loading || imagePrompt.length < 30}>
                             {loading ? 'Generating...' : 'Generate'}
                           </Button>
                         </div>
-                        {loading && <Skeleton className="h-12 w-12 rounded-full" />}
+                        {loading && <p className='text-black text-center font-bold'>It will take few seconds, but the wait will worth it</p>}
                         {generatedImageUrl && (
                           <div className="mt-4">
                             <Image src={generatedImageUrl} alt="Generated" width={300} height={300} className="w-full h-auto" />

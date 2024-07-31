@@ -43,17 +43,17 @@ const Hero = () => {
       <div className="flex flex-col sm:flex-row gap-4 mt-8">
         <Link href="/user/home">
           <Button size="lg" className="w-full sm:w-auto">
-            Get Started <ArrowRight className="ml-2 h-4 w-4" />
+            Let&apos;s Go <ArrowRight className="ml-2 h-4 w-4" />
           </Button>
         </Link>
 
         <a
           rel="noreferrer noopener"
-          href="https://hashnode.com"
+          href="https://github.com/Shivam-Katare/droog"
           target="_blank"
           className={`w-full sm:w-auto ${buttonVariants({ variant: "outline", size: "lg" })}`}
         >
-          Read about it
+          Github Repository
         </a>
       </div>
     </section>
@@ -195,7 +195,6 @@ const Footer = () => {
           <div>
             <h4 className="text-lg font-semibold mb-4">Resources</h4>
             <ul className="space-y-2">
-              <li><Link href="/blog" target="_blank" className="hover:text-gray-200 transition-colors">Read about Blog</Link></li>
               <li><Link href="/docs" target="_blank" className="hover:text-gray-200 transition-colors">ReadME</Link></li>
               <li><Link href="https://github.com/Shivam-Katare/droog" target="_blank" className="hover:text-gray-200 transition-colors">GitHub Repo</Link></li>
             </ul>
@@ -219,8 +218,7 @@ const Footer = () => {
         <div className="flex flex-col md:flex-row justify-between items-center">
           <p className="text-gray-400">&copy; 2024 DROOG. All rights reserved.</p>
           <div className="flex space-x-4 mt-4 md:mt-0">
-            <Link href="/privacy" className="text-gray-400 hover:text-white transition-colors">DROOG is an open source project</Link>
-            <Link href="/terms" className="text-gray-400 hover:text-white transition-colors">Contribute | Give a Star | Share with Friends</Link>
+            <Link href="https://github.com/Shivam-Katare/droog" className="text-gray-400 hover:text-white transition-colors">Contribute | Give a Star | Share with Friends</Link>
           </div>
         </div>
       </div>

@@ -30,7 +30,6 @@ const tones = [
   'Inspirational',
   'Sarcastic',
   'Dramatic',
-  'Romantic',
   'Mysterious',
   'Energetic',
   'Relaxed',
@@ -39,7 +38,6 @@ const tones = [
   'Poetic',
   'Nostalgic',
   'Optimistic',
-  'Pessimistic',
   'Excited',
   'Thoughtful',
   'Whimsical',
@@ -53,7 +51,6 @@ const tones = [
   'Grateful',
   'Curious',
   'Philosophical',
-  'Witty'
 ];
 
 const ImageCaptioner: React.FC = () => {
@@ -75,18 +72,20 @@ const ImageCaptioner: React.FC = () => {
     }
   }, []);
 
-  const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop, accept: {
-    'image/png': ['.png'],
-    'image/jpeg': ['.jpg', '.jpeg'],
-  } });
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    onDrop, accept: {
+      'image/png': ['.png'],
+      'image/jpeg': ['.jpg', '.jpeg'],
+    }
+  });
 
   const generateCaptionVariants = async (initialCaption: string) => {
 
-    if( developerAPIKeyUsageLeft <= 0 ) {
+    if (developerAPIKeyUsageLeft <= 0) {
       toast.error('You have reached the daily limit for using the Huggingface API. Please try again tomorrow.');
       return;
     }
-    
+
     const API_KEY = geminiKey || process.env.NEXT_PUBLIC_GEMINI_API_KEY;
     if (!API_KEY) {
       toast.error("Gemini API key is not set");
@@ -110,9 +109,9 @@ const ImageCaptioner: React.FC = () => {
         .filter(line => line.trim().match(/^\d+\./))
         .map(line => line.replace(/^\d+\.\s*/, '').trim());
 
-        if (!geminiKey && developerAPIKeyUsageLeft > 0) {
-          setDeveloperAPIKeyUsageLeft(developerAPIKeyUsageLeft - 1);
-        }
+      if (!geminiKey && developerAPIKeyUsageLeft > 0) {
+        setDeveloperAPIKeyUsageLeft(developerAPIKeyUsageLeft - 1);
+      }
       return variantCaptions;
     } catch (error) {
       toast.error('Error generating captions. Please try again. Or use your Huggingface Token.');
@@ -124,7 +123,7 @@ const ImageCaptioner: React.FC = () => {
   const generateCaption = async () => {
     if (!image) return;
 
-    if( developerHuggingFaceTokenUsageLeft <= 0 ) {
+    if (developerHuggingFaceTokenUsageLeft <= 0) {
       toast.error('You have reached the limit for using the Huggingface Token. Please try to add your own token.');
       return;
     }
@@ -155,6 +154,7 @@ const ImageCaptioner: React.FC = () => {
   };
   const handleCopy = (caption: string) => {
     navigator.clipboard.writeText(caption);
+    toast.success('Caption copied to clipboard');
   };
 
   return (
